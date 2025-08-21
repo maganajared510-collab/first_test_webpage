@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Name — Portfolio</title>
+  <meta name="description" content="Personal portfolio homepage">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #60a5fa;
+      --accent-2: #34d399;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 24px; }
+    header { position: sticky; top: 0; backdrop-filter: blur(10px); background: color-mix(in oklab, var(--bg), transparent 60%); border-bottom: 1px solid rgba(255,255,255,0.06); z-index: 10; }
+    nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    nav .brand { font-weight: 700; letter-spacing: .3px; }
+    nav .links { display: flex; gap: 16px; flex-wrap: wrap; }
+    .hero { display: grid; gap: 16px; padding: 72px 0 24px; }
+    .hero h1 { font-size: clamp(28px, 4vw, 44px); margin: 0; line-height: 1.1; }
+    .hero p { color: var(--muted); margin: 0; font-size: clamp(16px, 2vw, 18px); }
+    .btns { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .btn { display: inline-block; padding: 10px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12); background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); color: var(--text); font-weight: 600; }
+    .btn.primary { border-color: transparent; background: linear-gradient(180deg, var(--accent), var(--accent-2)); color: #0b1220; }
+    section { padding: 40px 0; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    .card { background: var(--card); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; }
+    footer { padding: 40px 0; color: var(--muted); font-size: 14px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .kicker { text-transform: uppercase; letter-spacing: .12em; font-size: 12px; color: var(--muted); }
+    .spacer { height: 16px; }
+    @media (prefers-reduced-motion: no-preference) {
+      .fade-in { animation: fade .8s ease both; }
+      @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    }
+  </style>
+</head>
+<body>
+  <!--
+    Quick edit guide:
+    1) Replace "Your Name" and links with your info.
+    2) Add or remove cards in Projects.
+    3) To publish: upload this file as index.html to your host (e.g., GitHub Pages).
+  -->
+  <header>
+    <div class="container">
+      <nav>
+        <div class="brand">Your Name</div>
+        <div class="links">
+          <a href="#about">About</a>
+          <a href="#projects">Projects</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero fade-in">
+      <p class="kicker">Welcome</p>
+      <h1>Hi, I’m <span style="color: var(--accent)">Your Name</span>—I build simple, fast web experiences.</h1>
+      <p>I’m a student and aspiring developer. Here you’ll find a few projects and ways to reach me.</p>
+      <div class="btns">
+        <a class="btn primary" href="#projects">See projects</a>
+        <a class="btn" href="mailto:you@example.com">Email me</a>
+      </div>
+    </section>
+
+    <section id="about">
+      <p class="kicker">About</p>
+      <h2>About me</h2>
+      <p>I enjoy front‑end development, UI design, and turning ideas into real apps. Currently learning C and UX basics.</p>
+    </section>
+
+    <section id="projects">
+      <p class="kicker">Work</p>
+      <h2>Projects</h2>
+      <div class="cards">
+        <article class="card">
+          <h3>Project One</h3>
+          <p>Short description of what it does and the stack you used.</p>
+          <div class="spacer"></div>
+          <a href="#" class="btn">Live demo</a>
+        </article>
+        <article class="card">
+          <h3>Project Two</h3>
+          <p>Another small write‑up. Link to repo or demo.</p>
+          <div class="spacer"></div>
+          <a href="#" class="btn">Source code</a>
+        </article>
+        <article class="card">
+          <h3>Project Three</h3>
+          <p>What problem does it solve? What did you learn?</p>
+          <div class="spacer"></div>
+          <a href="#" class="btn">Learn more</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact">
+      <p class="kicker">Contact</p>
+      <h2>Get in touch</h2>
+      <p>Best way to reach me is by email. For a quick message, use this link:</p>
+      <p><a href="mailto:you@example.com" class="btn">Email me</a></p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      © <span id="y"></span> Your Name. All rights reserved.
+    </div>
+  </footer>
+
+  <script>
+    // Update year automatically
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
