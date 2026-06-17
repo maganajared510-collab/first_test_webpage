@@ -1,127 +1,469 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Your Name — Portfolio</title>
-  <meta name="description" content="Personal portfolio homepage">
-  <style>
-    :root {
-      --bg: #0f172a;
-      --card: #111827;
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --accent: #60a5fa;
-      --accent-2: #34d399;
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .container { max-width: 1000px; margin: 0 auto; padding: 24px; }
-    header { position: sticky; top: 0; backdrop-filter: blur(10px); background: color-mix(in oklab, var(--bg), transparent 60%); border-bottom: 1px solid rgba(255,255,255,0.06); z-index: 10; }
-    nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    nav .brand { font-weight: 700; letter-spacing: .3px; }
-    nav .links { display: flex; gap: 16px; flex-wrap: wrap; }
-    .hero { display: grid; gap: 16px; padding: 72px 0 24px; }
-    .hero h1 { font-size: clamp(28px, 4vw, 44px); margin: 0; line-height: 1.1; }
-    .hero p { color: var(--muted); margin: 0; font-size: clamp(16px, 2vw, 18px); }
-    .btns { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
-    .btn { display: inline-block; padding: 10px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12); background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); color: var(--text); font-weight: 600; }
-    .btn.primary { border-color: transparent; background: linear-gradient(180deg, var(--accent), var(--accent-2)); color: #0b1220; }
-    section { padding: 40px 0; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-    .card { background: var(--card); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
-    .card h3 { margin: 0 0 6px; font-size: 18px; }
-    .card p { margin: 0; color: var(--muted); font-size: 14px; }
-    footer { padding: 40px 0; color: var(--muted); font-size: 14px; border-top: 1px solid rgba(255,255,255,0.06); }
-    .kicker { text-transform: uppercase; letter-spacing: .12em; font-size: 12px; color: var(--muted); }
-    .spacer { height: 16px; }
-    @media (prefers-reduced-motion: no-preference) {
-      .fade-in { animation: fade .8s ease both; }
-      @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Armador de Horario · FI UABC · 2026-2</title>
+<style>
+  :root{
+    --bg:#0f1320; --panel:#171c2e; --panel2:#1e2540; --line:#2b3354;
+    --txt:#e6e9f5; --muted:#9aa3c4; --accent:#5b8cff; --accent2:#3a4a7a;
+    --ok:#39d98a; --warn:#ff5d6c; --chip:#222a47;
+    --rowH:54px; --hours:15; /* 7..22 */
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font:14px/1.4 "Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--txt);overflow:hidden}
+  header{display:flex;align-items:center;gap:14px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+  header h1{font-size:16px;margin:0;font-weight:700;white-space:nowrap}
+  header h1 small{color:var(--muted);font-weight:400;font-size:12px}
+  .status{display:flex;gap:16px;margin-left:auto;font-size:12.5px;color:var(--muted);align-items:center}
+  .status b{color:var(--txt)}
+  .status .bad{color:var(--warn)}
+  .status .good{color:var(--ok)}
+  button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--txt);
+    padding:6px 11px;border-radius:8px}
+  button:hover{border-color:var(--accent)}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  button.ghost{background:transparent}
+  main{display:flex;height:calc(100% - 53px)}
+  /* ---- left: schedule ---- */
+  #left{flex:1 1 62%;overflow:auto;padding:12px}
+  .grid{display:grid;grid-template-columns:48px repeat(6,1fr);gap:0;min-width:760px}
+  .ghead{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:2px solid var(--line);
+    text-align:center;font-weight:600;padding:8px 2px;font-size:13px}
+  .corner{background:var(--panel);border-bottom:2px solid var(--line)}
+  .timecol{position:relative}
+  .timecol .h{height:var(--rowH);font-size:11px;color:var(--muted);text-align:right;padding-right:6px;
+    border-top:1px solid var(--line);transform:translateY(-7px)}
+  .daycol{position:relative;border-left:1px solid var(--line);height:calc(var(--rowH)*var(--hours))}
+  .daycol .line{position:absolute;left:0;right:0;border-top:1px solid var(--line);opacity:.5}
+  .ev{position:absolute;z-index:2;border-radius:7px;padding:4px 6px;overflow:hidden;cursor:pointer;
+    border:1.5px solid rgba(0,0,0,.35);box-shadow:0 1px 3px rgba(0,0,0,.35);font-size:11px;line-height:1.2}
+  .ev .x{position:absolute;top:1px;right:3px;font-weight:700;opacity:.55;font-size:13px}
+  .ev:hover .x{opacity:1}
+  .ev .cv{font-weight:700;font-size:11px}
+  .ev .mt{font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .ev .mae,.ev .rm{font-size:10px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ev .tg{display:inline-block;font-size:9px;padding:0 4px;border-radius:4px;background:rgba(0,0,0,.25);margin-left:4px}
+  .ev.conflict{border-color:var(--warn)!important;box-shadow:0 0 0 2px var(--warn)}
+  /* ---- right: picker ---- */
+  #right{flex:0 0 38%;max-width:520px;min-width:340px;border-left:1px solid var(--line);
+    background:var(--panel);display:flex;flex-direction:column}
+  .search{padding:12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+  .search .row{display:flex;gap:8px}
+  .search input,.search select{flex:1;padding:9px 11px;border-radius:8px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--txt);font:inherit}
+  .search input:focus{outline:none;border-color:var(--accent)}
+  .hint{font-size:11.5px;color:var(--muted)}
+  .freebar{align-items:center;justify-content:space-between}
+  .freechk{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt);cursor:pointer}
+  .freechk input{width:15px;height:15px;accent-color:var(--accent)}
+  .daycol{cursor:cell}
+  .blockcell{position:absolute;left:0;right:0;z-index:1;pointer-events:none;border-top:1px dashed var(--warn);
+    background:repeating-linear-gradient(45deg,rgba(255,93,108,.10),rgba(255,93,108,.10) 6px,rgba(255,93,108,.20) 6px,rgba(255,93,108,.20) 12px)}
+  .blockcell .lbl{position:absolute;right:4px;top:1px;font-size:9px;color:var(--warn);opacity:.85}
+  #results{flex:1;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:10px}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 11px}
+  .card.added{border-color:var(--ok)}
+  .matrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 11px;
+    border:1px solid var(--line);border-radius:9px;cursor:pointer;background:var(--panel2)}
+  .matrow:hover{border-color:var(--accent)}
+  .matrow.open{border-color:var(--accent);border-bottom-left-radius:0;border-bottom-right-radius:0}
+  .matrow.has{border-left:3px solid var(--ok)}
+  .matrow b{font-size:13px}
+  .matrow .cv{color:var(--accent);font-weight:700;font-size:12px}
+  .matrow .d{font-size:11px;color:var(--muted);margin-top:2px}
+  .matrow .add{font-size:14px;color:var(--accent)}
+  .grpwrap{display:flex;flex-direction:column;gap:8px;padding:8px;border:1px solid var(--line);
+    border-top:none;border-radius:0 0 9px 9px;background:rgba(0,0,0,.15)}
+  .card .top{display:flex;align-items:baseline;gap:8px}
+  .card .mt{font-weight:700;font-size:14px}
+  .card .cv{font-size:12px;color:var(--accent);font-weight:700}
+  .card .meta{font-size:11.5px;color:var(--muted);margin:2px 0 6px}
+  .badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:5px;background:var(--chip);
+    color:var(--txt);margin-right:4px}
+  .subsel{display:flex;gap:6px;align-items:center;margin:6px 0;font-size:12px;flex-wrap:wrap}
+  .subsel button{padding:3px 9px;font-size:12px;border-radius:6px}
+  .subsel button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .blk{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 8px;margin-top:6px;
+    border-radius:7px;border:1px solid var(--line);cursor:pointer;background:rgba(255,255,255,.02)}
+  .blk:hover{border-color:var(--accent)}
+  .blk.on{background:var(--accent2);border-color:var(--accent)}
+  .blk .l{min-width:0}
+  .blk .l b{font-size:12px}
+  .blk .l .d{font-size:11px;color:var(--muted)}
+  .blk .tg{font-size:10px;padding:1px 6px;border-radius:5px;background:var(--chip);white-space:nowrap}
+  .blk .add{font-size:16px;font-weight:700;color:var(--accent)}
+  .blk.on .add{color:var(--ok)}
+  .empty{color:var(--muted);text-align:center;margin-top:30px;font-size:13px}
+  .cardbtns{display:flex;gap:8px;margin-top:8px}
+  .cardbtns button{flex:1;font-size:12px;padding:6px}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
+  /* print */
+  @media print{
+    body{background:#fff;color:#000;overflow:visible}
+    header,#right,.ev .x{display:none!important}
+    main{display:block;height:auto}
+    #left{overflow:visible}
+    .ghead,.corner{background:#fff;color:#000}
+    .timecol .h{color:#333}
+    .ev{box-shadow:none;color:#000!important}
+  }
+</style>
 </head>
 <body>
-  <!--
-    Quick edit guide:
-    1) Replace "Your Name" and links with your info.
-    2) Add or remove cards in Projects.
-    3) To publish: upload this file as index.html to your host (e.g., GitHub Pages).
-  -->
-  <header>
-    <div class="container">
-      <nav>
-        <div class="brand">Your Name</div>
-        <div class="links">
-          <a href="#about">About</a>
-          <a href="#projects">Projects</a>
-          <a href="#contact">Contact</a>
-        </div>
-      </nav>
-    </div>
-  </header>
-
-  <main class="container">
-    <section class="hero fade-in">
-      <p class="kicker">Welcome</p>
-      <h1>Hi, I’m <span style="color: var(--accent)">Your Name</span>—I build simple, fast web experiences.</h1>
-      <p>I’m a Jared.</p>
-      <div class="btns">
-        <a class="btn primary" href="#projects">See projects</a>
-        <a class="btn" href="mailto:maganajared510@gmail.com">Email me</a>
+<header>
+  <h1>Armador de Horario <small>· FI UABC · Periodo 2026-2</small></h1>
+  <div class="status">
+    <span><b id="stMat">0</b> materias</span>
+    <span><b id="stHrs">0</b> h/sem</span>
+    <span id="stConf">Sin empalmes</span>
+    <button class="ghost" onclick="printSchedule()">🖨 Imprimir / PDF</button>
+    <button class="ghost" onclick="clearAll()">🗑 Limpiar</button>
+  </div>
+</header>
+<main>
+  <section id="left"><div id="grid" class="grid"></div></section>
+  <aside id="right">
+    <div class="search">
+      <div class="row">
+        <select id="fcar"><option value="">Todas las carreras</option></select>
+        <select id="fsem" disabled><option value="">Semestre…</option></select>
       </div>
-    </section>
-
-    <section id="about">
-      <p class="kicker">About</p>
-      <h2>About me</h2>
-      <p>kusa.</p>
-    </section>
-
-    <section id="projects">
-      <p class="kicker">Work</p>
-      <h2>Projects</h2>
-      <div class="cards">
-        <article class="card">
-          <h3>Project One</h3>
-          <p>Short description of what it does and the stack you used.</p>
-          <div class="spacer"></div>
-          <a href="#" class="btn">Live demo</a>
-        </article>
-        <article class="card">
-          <h3>Project Two</h3>
-          <p>Another small write‑up. Link to repo or demo.</p>
-          <div class="spacer"></div>
-          <a href="#" class="btn">Source code</a>
-        </article>
-        <article class="card">
-          <h3>Project Three</h3>
-          <p>What problem does it solve? What did you learn?</p>
-          <div class="spacer"></div>
-          <a href="#" class="btn">Learn more</a>
-        </article>
+      <div class="row">
+        <input id="q" placeholder="…o busca por clave (ej. 44162) / nombre" autocomplete="off">
       </div>
-    </section>
-
-    <section id="contact">
-      <p class="kicker">Contact</p>
-      <h2>Get in touch</h2>
-      <p>Best way to reach me is by email. For a quick message, use this link:</p>
-      <p><a href="mailto:you@example.com" class="btn">Email me</a></p>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container">
-      © <span id="y"></span> Your Name. All rights reserved.
+      <div class="row freebar">
+        <label class="freechk"><input type="checkbox" id="ffree"> Solo lo que cabe en mis <b>huecos libres</b></label>
+        <button id="clrblk" class="ghost" style="padding:3px 8px;font-size:11px">Limpiar bloqueos</button>
+      </div>
+      <div class="hint">Elige <b>carrera</b> y, en LSC, el <b>semestre</b>: salen sus obligatorias. O busca por <b>clave</b>. Haz clic en un bloque para colocarlo. Para los huecos: haz clic en las <b>celdas vacías</b> del horario para marcar tus horas ocupadas (trabajo, etc.) y activa el filtro.</div>
     </div>
-  </footer>
+    <div id="results"><div class="empty">Elige carrera y semestre, o busca una materia por su clave.</div></div>
+  </aside>
+</main>
 
-  <script>
-    // Update year automatically
-    document.getElementById("y").textContent = new Date().getFullYear();
-  </script>
+<script src="horarios_data.js"></script>
+<script src="mapa_lsc.js"></script>
+<script>
+const DATA = window.HORARIOS||[];
+const ABR  = window.CARRERA_ABR||{};
+const DAYS = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+const DSHORT= ["Lun","Mar","Mié","Jue","Vie","Sáb"];
+const H0=7, H1=22;
+const norm = s => (s||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+const titl = s => (s||"").toLowerCase().replace(/(^|[\s.\-])([a-záéíóúñ])/g,(m,p,c)=>p+c.toUpperCase());
+const mins = t => {const[a,b]=t.split(":");return (+a)*60+(+b);};
+const fmt  = t => t; // already HH:MM
+
+// ---- index ----
+const byClave={};
+DATA.forEach(s=>{(byClave[s.clave]=byClave[s.clave]||[]).push(s);});
+
+// carrera filter options
+const MAPA_LSC=window.MAPA_LSC||{};
+const SEM_ROMAN=window.SEM_ROMAN||{};
+const carSet={};
+DATA.forEach(s=>{if(s.carreraId)carSet[s.carreraId]=s.carrera;});
+const fcar=document.getElementById('fcar');
+Object.keys(carSet).sort((a,b)=>(+a)-(+b)).forEach(id=>{
+  const o=document.createElement('option');o.value=id;o.textContent=(ABR[id]||carSet[id]);fcar.appendChild(o);
+});
+const fsem=document.getElementById('fsem');
+function buildSemOptions(){
+  fsem.innerHTML='<option value="">Semestre…</option>';
+  if(fcar.value==='6'){
+    fsem.disabled=false;
+    Object.keys(MAPA_LSC).sort((a,b)=>(+a)-(+b)).forEach(s=>{
+      const o=document.createElement('option');o.value=s;o.textContent='Semestre '+(SEM_ROMAN[s]||s);fsem.appendChild(o);
+    });
+  }else{fsem.disabled=true;fsem.value='';}
+}
+
+// ---- placed state ----
+let placed = load();
+function uid(s){return [s.clave,s.carreraId,s.plan,s.grupo,s.tipo,s.sub||'-',s.salon,
+  s.slots.map(x=>x.d+x.i+x.f).join('')].join('|');}
+function save(){localStorage.setItem('horario2026_2',JSON.stringify(placed));}
+function load(){try{return JSON.parse(localStorage.getItem('horario2026_2'))||[];}catch(e){return[];}}
+
+// ---- horas ocupadas/bloqueadas (huecos) ----
+let blocked = loadBlocked();        // Set de "dia-hora" (ej. "0-8")
+function saveBlocked(){localStorage.setItem('horario2026_2_blk',JSON.stringify([...blocked]));}
+function loadBlocked(){try{return new Set(JSON.parse(localStorage.getItem('horario2026_2_blk'))||[]);}catch(e){return new Set();}}
+function busyIntervals(){
+  const a={0:[],1:[],2:[],3:[],4:[],5:[]};
+  placed.forEach(s=>s.slots.forEach(sl=>{if(sl.d<=5)a[sl.d].push([mins(sl.i),mins(sl.f)]);}));
+  blocked.forEach(k=>{const[d,h]=k.split('-').map(Number);if(d<=5)a[d].push([h*60,(h+1)*60]);});
+  return a;
+}
+function blocksFit(blocks,busy){
+  return blocks.every(s=>s.slots.every(sl=>{
+    if(sl.d>5)return true;const a=mins(sl.i),b=mins(sl.f);
+    return !busy[sl.d].some(iv=>a<iv[1]&&iv[0]<b);}));
+}
+function fittingSub(o,busy){
+  const cs=choiceSubs(o);const cands=cs.length?cs:[null];
+  for(const c of cands){if(blocksFit(includedBlocks(o,c),busy))return {fits:true,sub:c};}
+  return {fits:false};
+}
+function freeOn(){return document.getElementById('ffree').checked;}
+
+// ---- color per clave ----
+function hue(c){let h=0;for(const ch of c)h=(h*31+ch.charCodeAt(0))%360;return h;}
+function colors(c){const h=hue(c);return {bg:`hsl(${h} 70% 78%)`,bd:`hsl(${h} 60% 45%)`,tx:`hsl(${h} 70% 18%)`};}
+
+// ================= GRID =================
+function buildGridSkeleton(){
+  const g=document.getElementById('grid');g.innerHTML='';
+  g.style.setProperty('--hours',H1-H0);
+  g.appendChild(el('div','corner'));
+  DAYS.forEach(d=>g.appendChild(el('div','ghead',d)));
+  // time column
+  const tc=el('div','timecol');
+  for(let h=H0;h<H1;h++)tc.appendChild(el('div','h',(h<10?'0':'')+h+':00'));
+  g.appendChild(tc);
+  // day columns
+  for(let d=0;d<6;d++){
+    const col=el('div','daycol');col.dataset.day=d;
+    for(let h=1;h<H1-H0;h++){const ln=el('div','line');ln.style.top=(h*54)+'px';col.appendChild(ln);}
+    col.onclick=(ev)=>{
+      const r=col.getBoundingClientRect();
+      const hh=H0+Math.floor((ev.clientY-r.top)/54);
+      if(hh<H0||hh>=H1)return;
+      const k=d+'-'+hh;
+      if(blocked.has(k))blocked.delete(k); else blocked.add(k);
+      saveBlocked(); render(); renderResults();
+    };
+    g.appendChild(col);
+  }
+}
+function el(t,c,txt){const e=document.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e;}
+
+function render(){
+  buildGridSkeleton();
+  // expand placed -> day events
+  const evByDay={0:[],1:[],2:[],3:[],4:[],5:[]};
+  placed.forEach(s=>{
+    s.slots.forEach(sl=>{
+      if(sl.d>5)return;
+      evByDay[sl.d].push({s,start:mins(sl.i),end:mins(sl.f),i:sl.i,f:sl.f});
+    });
+  });
+  let conflicts=0;
+  const cols=document.querySelectorAll('.daycol');
+  // celdas bloqueadas (horas ocupadas)
+  blocked.forEach(k=>{const[d,h]=k.split('-').map(Number); if(d>5||h<H0||h>=H1)return;
+    const bc=el('div','blockcell'); bc.style.top=((h-H0)*54)+'px'; bc.style.height='54px';
+    bc.innerHTML='<span class="lbl">ocupado</span>'; cols[d].appendChild(bc);});
+  for(let d=0;d<6;d++){
+    const evs=evByDay[d].sort((a,b)=>a.start-b.start);
+    // conflict flag
+    evs.forEach((e,i)=>{e.conf=evs.some((o,j)=>j!==i && e.start<o.end && o.start<e.end);});
+    // lane layout
+    const lanes=[];
+    evs.forEach(e=>{
+      let placedLane=-1;
+      for(let L=0;L<lanes.length;L++){if(lanes[L]<=e.start){placedLane=L;break;}}
+      if(placedLane<0){placedLane=lanes.length;lanes.push(0);}
+      e.lane=placedLane;lanes[placedLane]=e.end;
+    });
+    const nLanes=Math.max(1,lanes.length);
+    // count overlap groups for width: recompute per event the simultaneous lanes
+    evs.forEach(e=>{
+      const overlap=evs.filter(o=>e.start<o.end && o.start<e.end);
+      const maxLane=Math.max(...overlap.map(o=>o.lane))+1;
+      e.div=maxLane;
+    });
+    evs.forEach(e=>{
+      if(e.conf)conflicts++;
+      const col=cols[d];
+      const top=(e.start-H0*60)/60*54;
+      const ht=Math.max(26,(e.end-e.start)/60*54-2);
+      const w=100/e.div, left=e.lane*w;
+      const c=colors(e.s.clave);
+      const ev=el('div','ev'+(e.conf?' conflict':''));
+      ev.style.cssText+=`top:${top}px;height:${ht}px;left:calc(${left}% + 1px);width:calc(${w}% - 3px);
+        background:${c.bg};border-color:${c.bd};color:${c.tx}`;
+      ev.innerHTML=`<span class="x">×</span>
+        <div class="cv">${e.s.clave}<span class="tg">${tipoAbr(e.s.tipo)}${e.s.sub&&e.s.sub!=='0'?' '+e.s.sub:''}</span></div>
+        <div class="mt">${esc(shortMat(e.s.materia))}</div>
+        <div class="mae">${esc(titl(e.s.maestro)||'Por asignar')}</div>
+        <div class="rm">${e.i}–${e.f} · ${esc(e.s.salon)}</div>`;
+      ev.title=`${e.s.materia} (${e.s.clave})\n${titl(e.s.maestro)}\n${e.s.tipo}${e.s.sub&&e.s.sub!=='0'?' subg. '+e.s.sub:''} · ${e.i}-${e.f} · ${e.s.salon}\nGrupo ${e.s.grupo} · ${ABR[e.s.carreraId]||''}`;
+      ev.onclick=(evt)=>{evt.stopPropagation();removeSession(e.s);};
+      col.appendChild(ev);
+    });
+  }
+  // status
+  const matKeys=new Set(placed.map(s=>s.clave));
+  document.getElementById('stMat').textContent=matKeys.size;
+  let h=0;placed.forEach(s=>s.slots.forEach(sl=>{if(sl.d<=5)h+=(mins(sl.f)-mins(sl.i))/60;}));
+  document.getElementById('stHrs').textContent=h.toFixed(h%1?1:0);
+  const sc=document.getElementById('stConf');
+  if(conflicts){sc.innerHTML=`<span class="bad">⚠ ${conflicts/2|0} empalme(s)</span>`;}
+  else{sc.innerHTML=`<span class="good">✓ Sin empalmes</span>`;}
+  save();
+}
+const tipoAbr=t=>({Clase:'CL',Taller:'TA',Laboratorio:'LAB'}[t]||t);
+const shortMat=m=>m.length>46?m.slice(0,44)+'…':m;
+const esc=s=>(s||"").replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+function removeSession(s){const u=uid(s);placed=placed.filter(p=>uid(p)!==u);render();renderResults();}
+function clearAll(){if(placed.length&&confirm('¿Vaciar todo el horario?')){placed=[];render();renderResults();}}
+
+// ================= RIGHT PANEL =================
+const q=document.getElementById('q');
+let chosenSub={};        // offeringKey -> sub elegido
+let expanded=new Set();  // claves desplegadas en modo semestre
+q.addEventListener('input',()=>{ if(q.value.trim()){fsem.value='';} renderResults(); });
+fcar.addEventListener('change',()=>{ buildSemOptions(); renderResults(); });
+fsem.addEventListener('change',()=>{ if(fsem.value){q.value='';} expanded.clear(); renderResults(); });
+document.getElementById('ffree').addEventListener('change',renderResults);
+document.getElementById('clrblk').addEventListener('click',()=>{ blocked.clear(); saveBlocked(); render(); renderResults(); });
+
+function offeringKey(s){return [s.clave,s.carreraId,s.plan,s.grupo].join('|');}
+
+// subgrupos que representan una ELECCIÓN real (algún tipo con >1 subgrupo)
+function choiceSubs(o){
+  const byTipo={};
+  o.sess.forEach(s=>{(byTipo[s.tipo]=byTipo[s.tipo]||new Set()); if(s.sub&&s.sub!=='0')byTipo[s.tipo].add(s.sub);});
+  const out=new Set();
+  Object.values(byTipo).forEach(set=>{ if(set.size>1) set.forEach(v=>out.add(v)); });
+  return [...out].sort();
+}
+// bloques incluidos para un grupo, según subgrupo elegido (POR TIPO)
+function includedBlocks(o,cur){
+  const byTipo={};
+  o.sess.forEach(s=>{(byTipo[s.tipo]=byTipo[s.tipo]||[]).push(s);});
+  const out=[];
+  Object.keys(byTipo).forEach(tipo=>{
+    const ss=byTipo[tipo];
+    const subsT=[...new Set(ss.filter(x=>x.sub&&x.sub!=='0').map(x=>x.sub))].sort();
+    if(subsT.length<=1){ out.push(...ss); }
+    else { const pick=subsT.includes(cur)?cur:subsT[0];
+           out.push(...ss.filter(x=>(!x.sub||x.sub==='0')||x.sub===pick)); }
+  });
+  out.sort((a,b)=>({Clase:0,Taller:1,Laboratorio:2}[a.tipo]-{Clase:0,Taller:1,Laboratorio:2}[b.tipo]));
+  return out;
+}
+
+function renderResults(){
+  const box=document.getElementById('results');
+  box.innerHTML='';
+  // ---- modo SEMESTRE (solo LSC) ----
+  if(fcar.value==='6' && fsem.value && MAPA_LSC[fsem.value]){
+    const claves=MAPA_LSC[fsem.value];
+    box.appendChild(el('div','hint','Materias obligatorias · Semestre '+(SEM_ROMAN[fsem.value]||fsem.value)+' · LSC. '+(freeOn()?'Solo grupos que caben en tus huecos.':'Haz clic en una para ver sus grupos.')));
+    claves.forEach(cl=>box.appendChild(renderMatRow(cl)));
+    return;
+  }
+  // ---- modo BÚSQUEDA ----
+  const term=norm(q.value.trim());
+  if(!term){box.innerHTML='<div class="empty">Elige carrera y semestre, o busca una materia por su clave.</div>';return;}
+  const fc=fcar.value;
+  let matches=DATA.filter(s=>{
+    if(fc&&s.carreraId!==fc)return false;
+    return s.clave.startsWith(term)||norm(s.materia).includes(term)||s.clave===term;
+  });
+  if(!matches.length){box.innerHTML='<div class="empty">Sin resultados para «'+esc(q.value)+'».</div>';return;}
+  let list=groupOfferings(matches);
+  if(freeOn()){
+    const busy=busyIntervals();
+    list=list.filter(o=>{const f=fittingSub(o,busy); if(f.fits&&f.sub!=null)chosenSub[o.key]=f.sub; return f.fits;});
+    if(!list.length){box.innerHTML='<div class="empty">Ningún grupo de «'+esc(q.value)+'» cabe en tus huecos libres.</div>';return;}
+  }
+  list.slice(0,60).forEach(o=>box.appendChild(renderCard(o)));
+}
+
+function groupOfferings(sessions){
+  const offs={};
+  sessions.forEach(s=>{const k=offeringKey(s);(offs[k]=offs[k]||{key:k,s0:s,sess:[]}).sess.push(s);});
+  return Object.values(offs).sort((a,b)=>a.s0.clave.localeCompare(b.s0.clave)||(+a.s0.grupo||0)-(+b.s0.grupo||0));
+}
+
+// fila colapsable de una materia (modo semestre)
+function renderMatRow(clave){
+  const sess=DATA.filter(s=>s.clave===clave && s.carreraId==='6');
+  const wrap=el('div');
+  const mat=(byClave[clave]&&byClave[clave][0]&&byClave[clave][0].materia)||clave;
+  let offs=groupOfferings(sess);
+  const totalOffs=offs.length;
+  if(freeOn()){const busy=busyIntervals();
+    offs=offs.filter(o=>{const f=fittingSub(o,busy); if(f.fits&&f.sub!=null)chosenSub[o.key]=f.sub; return f.fits;});}
+  const placedHere=sess.some(isPlaced);
+  const open=expanded.has(clave);
+  const none=offs.length===0;
+  const row=el('div','matrow'+(placedHere?' has':'')+(open?' open':''));
+  if(none)row.style.opacity='.5';
+  const sub = totalOffs===0 ? 'Sin oferta este periodo'
+            : freeOn() ? (offs.length?offs.length+' de '+totalOffs+' grupo(s) caben':'Ningún grupo cabe en tus huecos')
+            : totalOffs+' grupo(s)';
+  row.innerHTML=`<div><b>${esc(mat)}</b> <span class="cv">${clave}</span>
+     <div class="d">${sub}${placedHere?' · ✓ en tu horario':''}</div></div>
+     <span class="add">${none?'':(open?'▾':'▸')}</span>`;
+  row.onclick=()=>{ if(none)return; if(open)expanded.delete(clave); else expanded.add(clave); renderResults(); };
+  wrap.appendChild(row);
+  if(open){ const gw=el('div','grpwrap'); offs.forEach(o=>gw.appendChild(renderCard(o))); wrap.appendChild(gw); }
+  return wrap;
+}
+
+function renderCard(o){
+  const s0=o.s0;
+  const cSubs=choiceSubs(o);
+  const card=el('div','card');
+  if(o.sess.some(isPlaced))card.classList.add('added');
+  const cur=chosenSub[o.key]||(cSubs[0]||null);
+  // maestro principal = el de Clase/Taller
+  const mainMae=titl((o.sess.find(s=>s.tipo==='Clase')||o.sess.find(s=>s.tipo==='Taller')||o.sess[0]).maestro)||'Por asignar';
+  card.innerHTML=`<div class="top"><span class="mt">${esc(s0.materia)}</span><span class="cv">${s0.clave}</span></div>
+    <div class="meta"><span class="badge">Grupo ${esc(s0.grupo||'-')}</span>
+      <span class="badge">${esc(ABR[s0.carreraId]||s0.carrera||'')}</span>
+      <span class="badge">Plan ${esc(s0.plan||'-')}</span></div>
+    <div class="meta">👤 ${esc(mainMae)}</div>`;
+  if(cSubs.length>1){
+    const sel=el('div','subsel');sel.appendChild(el('span',null,'Subgrupo:'));
+    cSubs.forEach(sg=>{const b=el('button',(sg===cur?'on':''),sg);
+      b.onclick=(ev)=>{ev.stopPropagation();chosenSub[o.key]=sg;renderResults();};sel.appendChild(b);});
+    card.appendChild(sel);
+  }
+  const blocks=includedBlocks(o,cur);
+  blocks.forEach(s=>{
+    const on=isPlaced(s);
+    const b=el('div','blk'+(on?' on':''));
+    const dias=s.slots.map(sl=>DSHORT[sl.d]).join('/');
+    const hora=s.slots.length?(s.slots[0].i+'–'+s.slots[0].f):'';
+    const mae=titl(s.maestro)||'Por asignar';
+    const diff=s.maestro && norm(s.maestro)!==norm((o.sess.find(x=>x.tipo==='Clase')||o.sess.find(x=>x.tipo==='Taller')||o.sess[0]).maestro);
+    b.innerHTML=`<div class="l"><b>${s.tipo}${s.sub&&s.sub!=='0'?' · subg. '+s.sub:''}</b>
+        <div class="d">${dias} ${hora} · 🚪 ${esc(s.salon)}</div>
+        <div class="d" style="color:${diff?'var(--warn)':'var(--muted)'}">👤 ${esc(mae)}</div></div>
+      <span class="tg">${tipoAbr(s.tipo)}</span><span class="add">${on?'✓':'+'}</span>`;
+    b.onclick=(ev)=>{ev.stopPropagation();toggleSession(s);};
+    card.appendChild(b);
+  });
+  const btns=el('div','cardbtns');
+  const addAll=el('button','primary','+ Agregar grupo'+(cSubs.length>1?' (subg. '+cur+')':''));
+  addAll.onclick=(ev)=>{ev.stopPropagation();blocks.forEach(s=>{if(!isPlaced(s))placed.push(clone(s));});render();renderResults();};
+  const rmAll=el('button',null,'Quitar grupo');
+  rmAll.onclick=(ev)=>{ev.stopPropagation();const us=new Set(o.sess.map(uid));placed=placed.filter(p=>!us.has(uid(p)));render();renderResults();};
+  btns.appendChild(addAll);btns.appendChild(rmAll);card.appendChild(btns);
+  return card;
+}
+function isPlaced(s){const u=uid(s);return placed.some(p=>uid(p)===u);}
+function clone(s){return JSON.parse(JSON.stringify(s));}
+function toggleSession(s){
+  if(isPlaced(s))removeSession(s);
+  else{placed.push(clone(s));render();renderResults();}
+}
+
+function printSchedule(){window.print();}
+
+// init
+buildSemOptions();
+buildGridSkeleton();render();renderResults();
+</script>
 </body>
 </html>
